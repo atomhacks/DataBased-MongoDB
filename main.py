@@ -1,11 +1,10 @@
 import discord
 from dotenv import load_dotenv
-from os import environ
 from mongoengine import *
 
-from os import environ
+import os
 load_dotenv()
-token = environ["TOKEN"]
+token = os.environ["TOKEN"]
 print(token)
 
 connect('economy')
@@ -13,10 +12,6 @@ connect('economy')
 class Item(Document):
     name = StringField(unique=True)
     price = IntField()
-
-class ShopItem(Document):
-    item = ReferenceField(Item)
-    quantity = IntField()
 
 class Player(Document):
     userId = IntField()
@@ -31,7 +26,7 @@ async def hello(ctx, name: str = None):
     name = name or ctx.author.name
     await ctx.respond(f"Hello {name}!")
 
-@bot.slash_command(guild_ids=[804100748275220530])
+@bot.slash_command(guild_ids=[os.environ["GUILD_ID"]])
 async def inventory(ctx):
     try:
         player = Player.objects.get(userId=ctx.author.id)
@@ -48,11 +43,11 @@ async def inventory(ctx):
     await ctx.respond(embed=embed)
 
 from discord.ui import Button, Select, View
-@bot.slash_command()
+@bot.slash_command(guild_ids=[os.environ["GUILD_ID"]])
 async def shop(ctx: discord.ApplicationContext):
     options = []
-    for item in ShopItem.objects:
-        option = discord.SelectOption(label=item.item.name, description=item.item.price)
+    for item in Item.objects:
+        option = discord.SelectOption(label=item.name, description=item.price)
         options.append(option)
     menu = Select(placeholder="Select an item for purchase", options=options)
     async def on_select(interaction: discord.Interaction):
@@ -100,7 +95,7 @@ async def shop(ctx: discord.ApplicationContext):
     view.add_item(menu)
     await ctx.respond(view=view)
 
-@bot.slash_command(guild_ids=[804100748275220530])
+@bot.slash_command(guild_ids=[os.environ["GUILD_ID"]])
 async def sparechange(ctx: discord.ApplicationContext, amount: int = None):
     try:
         player = Player.objects.get(userId=ctx.author.id)
