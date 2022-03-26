@@ -24,7 +24,7 @@ async def hello(ctx, name: str = None):
     name = name or ctx.author.name
     await ctx.respond(f"Hello {name}!")
 
-@bot.slash_command(guild_ids=[804100748275220530])
+@bot.slash_command(guild_ids=[os.environ["GUILD_ID"]])
 async def inventory(ctx):
     try:
         player = Player.objects.get(userId=ctx.author.id)
@@ -41,7 +41,7 @@ async def inventory(ctx):
     await ctx.respond(embed=embed)
 
 from discord.ui import Button, Select, View
-@bot.slash_command(guild_ids=[804100748275220530])
+@bot.slash_command(guild_ids=[os.environ["GUILD_ID"]])
 async def shop(ctx: discord.ApplicationContext):
     options = []
     for item in Item.objects:
@@ -93,7 +93,7 @@ async def shop(ctx: discord.ApplicationContext):
     view.add_item(menu)
     await ctx.respond(view=view)
 
-@bot.slash_command(guild_ids=[804100748275220530])
+@bot.slash_command(guild_ids=[os.environ["GUILD_ID"]])
 async def sparechange(ctx: discord.ApplicationContext, amount: int = None):
     try:
         player = Player.objects.get(userId=ctx.author.id)
